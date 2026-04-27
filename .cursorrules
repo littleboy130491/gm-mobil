@@ -1,0 +1,129 @@
+# Statamic MCP Server v2.0 Integration
+
+This project uses Statamic MCP Server v2.0 for enhanced AI-assisted development.
+Requires Statamic v6+ and laravel/mcp v0.6+.
+
+## MCP Server Configuration
+- Command: php artisan mcp:start statamic
+- Project Path: /home/henry/Desktop/projects/gm-mobil
+- Tools Available: 11 MCP tools (Router Architecture)
+- Authentication: Scoped API tokens (manage via CP → Tools → MCP)
+
+## MCP Tools Architecture (Router-Based)
+
+### 🚦 Domain Routers (9 Core Tools)
+
+#### statamic-entries
+**Purpose**: Manage entries across all collections
+**Actions**: list, get, create, update, delete, publish, unpublish
+**Example**: `{"action": "list", "collection": "blog"}`
+
+#### statamic-terms
+**Purpose**: Manage taxonomy terms
+**Actions**: list, get, create, update, delete
+**Example**: `{"action": "list", "taxonomy": "categories"}`
+
+#### statamic-globals
+**Purpose**: Manage global set values
+**Actions**: list, get, update
+**Example**: `{"action": "get", "handle": "site_settings"}`
+
+#### statamic-structures
+**Purpose**: Manage all structural elements of your Statamic site
+**Actions**: list, get, create, update, delete, reorder
+**Handles**: collections (8+ ops), taxonomies (7+ ops), navigations (6+ ops), sites (5+ ops)
+**Example**: `{"action": "create", "type": "collection", "handle": "products"}`
+
+#### statamic-assets
+**Purpose**: Complete asset and media file management
+**Actions**: list, upload, move, rename, delete, metadata, regenerate
+**Handles**: containers (5+ ops), assets (15+ ops)
+**Example**: `{"action": "upload", "container": "images", "file": "..."}`
+
+#### statamic-users
+**Purpose**: User, role, and permission management
+**Actions**: list, get, create, update, delete, assign-role, permissions
+**Handles**: users (10+ ops), roles (8+ ops), user groups (6+ ops)
+**Example**: `{"action": "assign-role", "user": "123", "role": "editor"}`
+
+#### statamic-system
+**Purpose**: System operations and maintenance
+**Actions**: info, cache-clear, cache-warm, health-check, config, discover
+**Handles**: cache (5+ ops), health (3+ ops), config (4+ ops), info (3+ ops)
+**Example**: `{"action": "cache-clear", "types": ["stache", "static"]}`
+
+#### statamic-blueprints
+**Purpose**: Blueprint schema management and type generation
+**Actions**: list, get, create, update, delete, scan, generate, types
+**Handles**: all blueprint operations (10+ ops)
+**Example**: `{"action": "generate", "type": "typescript", "blueprint": "article"}`
+
+### 🎓 Agent Education Tools (2 Specialized Tools)
+
+#### statamic-discovery
+**Purpose**: Help AI agents discover the right tools for their intent
+**Features**:
+- Intent-based tool recommendations
+- Usage examples for common workflows
+- Tool capability search
+**Example**: `{"intent": "create a blog", "context": "new project"}`
+
+#### statamic-schema
+**Purpose**: Detailed schema inspection for any tool
+**Features**:
+- Complete parameter documentation
+- Valid value enumerations
+- Response format examples
+**Example**: `{"tool": "statamic-entries", "action": "create"}`
+
+## Authentication
+
+Web MCP endpoints require scoped API tokens:
+1. Visit Statamic CP → Tools → MCP
+2. Create a token with required scopes (e.g., content:read, content:write)
+3. Use Bearer token authentication for web requests
+4. CLI mode (php artisan mcp:start) runs with full permissions
+
+## Development Guidelines
+
+### Router Pattern Usage
+
+1. **Start with Discovery**:
+   - Use `statamic-discovery` to find the right tool for your intent
+   - Use `statamic-schema` to understand tool parameters and responses
+   - Use `statamic-system` with action "info" for installation details
+
+2. **Router Pattern Syntax**:
+   - Each router handles multiple related operations via the "action" parameter
+   - Always specify both "action" and relevant type/target parameters
+   - Example: `{"action": "list", "type": "entries", "collection": "blog"}`
+
+3. **Content Operations**:
+   - Use `statamic-entries` for entry operations (CRUD, publish/unpublish)
+   - Use `statamic-terms` for taxonomy term operations
+   - Use `statamic-globals` for global set value operations
+   - Use `statamic-structures` for collections, taxonomies, navigations
+   - Use `statamic-blueprints` for schema management and type generation
+
+4. **Performance & Best Practices**:
+   - Router tools consolidate operations for better performance
+   - Automatic cache clearing after structural changes
+   - Pagination support with limit and offset parameters
+   - Dry-run support for safe testing of modifications
+
+### Code Quality Rules
+- No inline PHP in Blade templates
+- No direct facade calls (Statamic, DB, Http, Cache) in views
+- Always include alt text for images
+- Use descriptive link text for accessibility
+- Prefer Statamic components and tags
+
+### Field Type Categories
+- **Text**: text, textarea, markdown, code
+- **Rich Content**: bard, redactor
+- **Media**: assets, video
+- **Relationships**: entries, taxonomy, users, collections
+- **Structured Data**: replicator, grid, group, yaml, array
+- **Special**: date, color, toggle, select, range
+
+When suggesting Statamic implementations, always reference MCP tools and follow these patterns.
